@@ -1,0 +1,47 @@
+# Refreshes DEFCON Scout's data from FPL every 6 hours.
+#
+# It downloads FPL's public data, rebuilds data.json, and saves it to the
+# "data" branch of this repository. The website reads that file directly, so
+# data updates never trigger a Netlify deploy (and never use Netlify credits).
+#
+# You can also run it by hand: Actions tab -> "Update DEFCON data" -> "Run workflow".
+
+name: Update DEFCON data
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # 00:17, 06:17, 12:17 and 18:17 UTC every day
+  workflow_dispatch: {}       # adds the "Run workflow" button
+
+permissions:
+  contents: write             # lets the job save data.json to the data branch
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download FPL data and rebuild data.json
+        run: python scripts/build_data.py --fetch --out out/data.json
+
+      - name: Save data.json to the data branch
+        run: |
+          cd out
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -q -m "Data update $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" data
