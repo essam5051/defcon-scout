@@ -1,0 +1,6 @@
+# Netlify serves the "site" folder as-is. There is nothing to build.
+# Data updates live on the separate "data" branch, which Netlify ignores,
+# so they never cause a deploy.
+[build]
+  publish = "site"
+  command = ""

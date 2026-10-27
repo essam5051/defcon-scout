@@ -1,0 +1,503 @@
+<!doctype html><!--SHELL-->
+<html lang="en"><!--SHELL-->
+<head><!--SHELL-->
+<meta charset="utf-8"><!--SHELL-->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><!--SHELL-->
+<meta name="description" content="Which FPL defenders and midfielders hit DEFCON, which teams allow it, and who to pick for the coming gameweeks."><!--SHELL-->
+<title>DEFCON Scout</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a scout's clipboard. Sticky header with tabs; each view is one dense, sortable sheet. */
+:root{
+  --bg:#f2f4f6; --surface:#ffffff; --ink:#15212c; --muted:#5d6a77; --line:#d5dce3; --soft:#e8ecf0;
+  --accent:#1f43c9; --accent-soft:#dfe6fb; --good:#17825a; --good-soft:#d9f0e5; --bad:#b93a33; --bad-soft:#f6dedc; --warn:#a86a06; --warn-soft:#f7ead2;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#161f28; --ink:#e4eaf0; --muted:#93a1ae; --line:#2a3644; --soft:#1d2833;
+  --accent:#8099ff; --accent-soft:#1f2b52; --good:#4cc893; --good-soft:#123326; --bad:#f07b72; --bad-soft:#3a1d1b; --warn:#e8b14c; --warn-soft:#3a2c12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#161f28; --ink:#e4eaf0; --muted:#93a1ae; --line:#2a3644; --soft:#1d2833;
+  --accent:#8099ff; --accent-soft:#1f2b52; --good:#4cc893; --good-soft:#123326; --bad:#f07b72; --bad-soft:#3a1d1b; --warn:#e8b14c; --warn-soft:#3a2c12; color-scheme:dark}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:18px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;letter-spacing:.01em;margin:0;text-transform:uppercase;line-height:1}
+h1 span{color:var(--accent)}
+.meta{color:var(--muted);font-size:.85rem}
+nav{display:flex;gap:4px;margin-top:14px;overflow-x:auto}
+nav a{font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:8px 12px 10px;border-bottom:3px solid transparent;white-space:nowrap}
+nav a[aria-current="page"]{color:var(--ink);border-color:var(--accent)}
+nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-top:20px}
+.intro{max-width:68ch;color:var(--muted);margin:0 0 16px}
+.intro b{color:var(--ink);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.ctl{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ctl label,.lbl{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+select,input[type=search],input[type=number]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+input[type=search]{width:180px;max-width:100%}
+input[type=number]{width:72px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-weight:600;border:0;background:var(--bg);color:var(--muted);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--soft);white-space:nowrap;vertical-align:middle}
+th{font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface);position:sticky;top:0}
+th.sort{cursor:pointer;user-select:none}
+th.sort:hover{color:var(--ink)}
+th[aria-sort] ::after{content:""}
+th[aria-sort="descending"]::after{content:" ▼";color:var(--accent)}
+th[aria-sort="ascending"]::after{content:" ▲";color:var(--accent)}
+td.num,th.num{text-align:right}
+tbody tr:last-child td{border-bottom:0}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--soft)}
+.rank{color:var(--muted);width:2.5em}
+.pname{font-weight:600}
+.team{display:inline-block;font-family:var(--display);font-weight:600;letter-spacing:.04em;font-size:.95rem;color:var(--muted)}
+.big{font-family:var(--display);font-weight:700;font-size:1.25rem}
+.sub{color:var(--muted);font-size:.8rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.low{background:var(--soft);color:var(--muted)}
+.fx{display:flex;gap:4px}
+.chip{display:inline-flex;flex-direction:column;align-items:center;min-width:46px;padding:3px 4px;border-radius:5px;font-family:var(--display);font-weight:600;font-size:.9rem;line-height:1.05;letter-spacing:.02em}
+.chip small{font-family:var(--body);font-weight:600;font-size:.66rem;opacity:.85}
+.chip.g3{background:var(--good);color:var(--surface)}
+.chip.g2{background:var(--good-soft);color:var(--good)}
+.chip.g1{background:var(--soft);color:var(--ink)}
+.chip.g0{background:var(--bad-soft);color:var(--bad)}
+.bar{position:relative;height:8px;width:110px;background:var(--soft);border-radius:4px;overflow:hidden;display:inline-block;vertical-align:middle}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:4px}
+.idx{display:inline-flex;align-items:center;gap:8px}
+.ibar-mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--muted)}
+.ibar{position:relative;width:120px;height:10px;background:var(--soft);border-radius:3px;display:inline-block}
+.ibar i{position:absolute;top:0;bottom:0;border-radius:3px}
+.posb{font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.posb[data-pos="MID"]{background:var(--soft);color:var(--ink)}
+.pos{color:var(--good);font-weight:600}.neg{color:var(--bad);font-weight:600}
+.grid{display:flex;gap:3px}
+.cell{width:28px;height:28px;border-radius:4px;display:grid;place-items:center;font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums}
+.cell.hit{background:var(--accent);color:var(--surface)}
+.cell.miss{border:1.5px solid var(--line);color:var(--muted)}
+.cell.near{border:1.5px solid var(--accent);color:var(--accent)}
+.cell.short{background:repeating-linear-gradient(135deg,var(--soft) 0 4px,transparent 4px 8px);color:var(--muted);border:1px dashed var(--line)}
+.cell.dnp{color:var(--line)}
+.cell.dgw{width:auto;padding:0 3px;gap:2px;display:flex}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;color:var(--muted);font-size:.8rem;margin:10px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .cell{width:18px;height:18px;font-size:.6rem}
+tr.detail td{background:var(--bg);white-space:normal;padding:14px}
+.detailbox{display:flex;flex-wrap:wrap;gap:18px 32px}
+.detailbox > div{min-width:0}
+.log{display:flex;flex-wrap:wrap;gap:6px}
+.log .g{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem;color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.method{max-width:70ch}
+.method h2{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:1.4rem;letter-spacing:.02em;margin:26px 0 6px;text-wrap:balance}
+.method p,.method li{color:var(--ink)}
+.method li{margin-bottom:6px}
+.method code{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:.9em}
+.note{background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:10px 14px;margin:0 0 14px;font-size:.88rem;max-width:80ch}
+.note b{color:var(--warn)}
+.navcount{display:inline-block;min-width:1.3em;margin-left:6px;padding:0 5px;border-radius:999px;background:var(--accent);color:var(--surface);font-family:var(--body);font-size:.7rem;font-weight:700;line-height:1.5;text-align:center;vertical-align:2px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:disabled{opacity:.5;cursor:default}
+.verdict{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:16px 18px;margin-bottom:12px}
+.verdict h2{font-family:var(--display);font-weight:700;font-size:1.7rem;line-height:1.1;margin:0 0 6px;text-wrap:balance}
+.verdict h2 b{color:var(--accent)}
+.verdict p{margin:0;color:var(--muted)}
+.vstrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.vcell{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0;cursor:pointer;text-align:left;font:inherit;color:var(--ink)}
+.vcell[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.vcell .lbl{display:block;margin-bottom:2px}
+.vcell .w{font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vcell .m{color:var(--muted);font-size:.8rem}
+.cmp th.ph{text-transform:none;letter-spacing:0;font-size:inherit;color:var(--ink);vertical-align:top;min-width:150px}
+.cmp th.ph .pname{font-size:1.05rem}
+.cmp td.k{color:var(--muted);font-size:.82rem;white-space:normal;min-width:110px}
+.cmp tr.sec td{background:var(--bg);font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:6px}
+.cmp td.v{font-variant-numeric:tabular-nums}
+.cmp td.best{background:var(--good-soft)}
+.cmp td.best b,.cmp td.best .big{color:var(--good)}
+.x{font:inherit;border:0;background:none;color:var(--muted);cursor:pointer;padding:0 0 0 6px;font-size:1.1rem;line-height:1}
+.x:hover{color:var(--bad)}
+.fxc{display:flex;align-items:center;gap:8px}
+.fxc + .fxc{margin-top:4px}
+.fxc .sub{white-space:nowrap}
+.cmp .grid{flex-wrap:wrap;max-width:260px}
+.small{font-size:.8rem;color:var(--muted);margin-top:10px;max-width:80ch}
+@media (max-width:640px){.vstrip{grid-template-columns:repeat(2,minmax(0,1fr))}.verdict h2{font-size:1.4rem}.cmp th.ph{min-width:128px}.cmp td.k{min-width:90px}}
+footer{color:var(--muted);font-size:.8rem;margin-top:28px;max-width:80ch}
+@media (max-width:640px){h1{font-size:1.7rem}.hide-sm{display:none}th,td{padding:7px 8px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><!--SHELL-->
+<body><!--SHELL-->
+
+<div class="wrap">
+<header>
+  <div class="brand">
+    <h1>DEFCON <span>Scout</span></h1>
+    <div class="meta" id="meta"></div>
+  </div>
+  <nav aria-label="Views">
+    <a href="#picks" data-view="picks">Transfer picks</a>
+    <a href="#compare" data-view="compare">Compare<span class="navcount" id="cmpCount" hidden></span></a>
+    <a href="#teams" data-view="teams">Teams allowing</a>
+    <a href="#log" data-view="log">Player log</a>
+    <a href="#method" data-view="method">How it works</a>
+  </nav>
+</header>
+
+<main>
+  <section id="v-picks" hidden>
+    <p class="intro">Defenders and defensive midfielders ranked by <b>expected DEFCON hits</b> over the coming gameweeks: how often they hit it, how often they play 60+ minutes, and how leaky each upcoming opponent has been against their position. Tap a player for his game log.</p>
+    <div class="note" id="sampleNote"></div>
+    <div class="controls">
+      <div class="ctl"><span class="lbl">Position</span><div class="seg" id="p-pos"><button type="button" data-p="ALL">All</button><button type="button" data-p="DEF">DEF</button><button type="button" data-p="MID">MID</button></div></div>
+      <div class="ctl"><span class="lbl">Next</span><div class="seg" id="horizon"><button type="button" data-h="3">3 GWs</button><button type="button" data-h="5">5 GWs</button><button type="button" data-h="8">8 GWs</button></div></div>
+      <div class="ctl"><label for="p-price">Max price</label><select id="p-price"></select></div>
+      <div class="ctl"><label for="p-team">Team</label><select id="p-team"></select></div>
+      <div class="ctl"><label for="p-min">Min 60′ games</label><input id="p-min" type="number" min="0" max="38" value="4"></div>
+      <div class="ctl"><label for="p-q">Search</label><input id="p-q" type="search" placeholder="Player name"></div>
+    </div>
+    <div class="tablebox"><table id="t-picks"></table></div>
+    <div class="legend"><span>Fixture colour = his chance of a hit in that game:</span><span><i class="chip g3">50%+</i></span><span><i class="chip g2">35–50%</i></span><span><i class="chip g1">22–35%</i></span><span><i class="chip g0">under 22%</i></span></div>
+  </section>
+
+  <section id="v-compare" hidden>
+    <p class="intro">Put 2 to 4 players side by side: their hit rates, each upcoming opponent, and who comes out ahead on <b>expected DEFCON hits</b> for the gameweeks you choose.</p>
+    <div class="controls">
+      <div class="ctl"><label for="c-add">Add a player</label><input id="c-add" type="search" list="c-list" placeholder="Type a name" autocomplete="off"><datalist id="c-list"></datalist></div>
+      <div class="ctl"><span class="lbl">Compare over</span><div class="seg" id="c-h"><button type="button" data-h="1" id="c-h1">Next GW</button><button type="button" data-h="3">Next 3</button><button type="button" data-h="5">Next 5</button><button type="button" data-h="8">Next 8</button></div></div>
+    </div>
+    <div id="cmpOut"></div>
+  </section>
+
+  <section id="v-teams" hidden>
+    <p class="intro">Every opposing player who played 60+ minutes counts as a <b>chance</b> against that team; every one who hit DEFCON counts as <b>allowed</b>. Defenders and midfielders are counted separately, since they need different totals (10 and 12). <b>Vs expected</b> compares the hits allowed with what those same players usually manage, so facing elite DEFCON hitters doesn't make a team look leaky. The <b>leak index</b> blends both and is what the picks use: 1.00 is league average.</p>
+    <p class="note" id="midNote" hidden></p>
+    <div class="controls">
+      <div class="ctl"><span class="lbl">Against</span><div class="seg" id="t-pos"><button type="button" data-p="DEF">Defenders</button><button type="button" data-p="MID">Midfielders</button></div></div>
+      <div class="ctl"><span class="lbl">Venue</span><div class="seg" id="venue"><button type="button" data-v="all">All games</button><button type="button" data-v="home">At home</button><button type="button" data-v="away">Away</button></div></div>
+    </div>
+    <div class="tablebox"><table id="t-teams"></table></div>
+  </section>
+
+  <section id="v-log" hidden>
+    <p class="intro">Every game this season for each player. The number in each square is his defensive actions. Defenders need 10 (clearances, blocks, interceptions and tackles); midfielders need 12, and recoveries count for them.</p>
+    <div class="controls">
+      <div class="ctl"><span class="lbl">Position</span><div class="seg" id="d-pos"><button type="button" data-p="ALL">All</button><button type="button" data-p="DEF">DEF</button><button type="button" data-p="MID">MID</button></div></div>
+      <div class="ctl"><label for="d-team">Team</label><select id="d-team"></select></div>
+      <div class="ctl"><label for="d-min">Min 60′ games</label><input id="d-min" type="number" min="0" max="38" value="3"></div>
+      <div class="ctl"><label for="d-q">Search</label><input id="d-q" type="search" placeholder="Player name"></div>
+    </div>
+    <div class="legend">
+      <span><i class="cell hit">12</i>Hit (60+ min)</span>
+      <span><i class="cell near">9</i>Missed by 1–2 actions</span>
+      <span><i class="cell miss">5</i>Missed</span>
+      <span><i class="cell short">7</i>Under 60 min (not counted)</span>
+      <span><i class="cell dnp">·</i>Didn't play</span>
+    </div>
+    <div class="tablebox"><table id="t-def"></table></div>
+  </section>
+
+  <section id="v-method" class="method" hidden>
+    <h2>Where the data comes from</h2>
+    <p>Everything comes from Fantasy Premier League's own public data: the player list, the fixture list, and the points breakdown for every player in every match. A game counts as a DEFCON hit only if FPL actually awarded the 2 points, so these numbers match the FPL site exactly. Double gameweeks count as two separate games.</p>
+    <h2>The 60-minute rule</h2>
+    <p>A game only counts if the player played 60 minutes or more, both for his own hit rate and for the opponent's numbers. A 15-minute cameo isn't a fair chance to reach the threshold. Hits in shorter games still appear in the log, just greyed out.</p>
+    <h2>Which midfielders are included</h2>
+    <p>Only midfielders with at least 2 DEFCON hits this season (in any games) are included. That keeps wingers and attacking midfielders, who almost never reach 12 actions, out of the player lists and out of the chances counted against each team. The list is rebuilt every week, so a midfielder joins as soon as he gets his second hit.</p>
+    <h2>How "allowed" is worked out</h2>
+    <ul>
+      <li><b>Chances:</b> opposing defenders (or included midfielders) who played 60+ minutes against the team.</li>
+      <li><b>Allowed:</b> how many of those hit DEFCON.</li>
+      <li><b>Expected:</b> the sum of each of those players' own hit rates, leaving that match out. If a team allowed 9 when the players it faced would normally produce 6, it is +3.</li>
+      <li><b>Leak index:</b> allowed divided by expected, pulled toward 1.00 while the sample is small, so one wild game can't top the table. Home and away versions are pulled toward the team's overall figure the same way.</li>
+    </ul>
+    <h2>How picks are scored</h2>
+    <ul>
+      <li><b>Hit rate:</b> his hits in 60+ minute games, pulled slightly toward the league average when he has only a few games.</li>
+      <li><b>Matchup:</b> that rate adjusted by the opponent's leak index against his position, for the right venue, plus the league-wide home/away difference.</li>
+      <li><b>Minutes:</b> multiplied by how often he has played 60+ minutes for his current club, and by FPL's chance-of-playing figure for the next gameweek when there is a flag.</li>
+      <li><b>Expected hits</b> is that added up across the chosen gameweeks. Expected points is twice that.</li>
+    </ul>
+    <h2>The comparison verdict</h2>
+    <p>The verdict compares expected DEFCON hits over the gameweeks you pick. If two players are within 0.05 expected hits of each other, it calls it too close to call rather than pretending one is better. It only covers DEFCON points: clean sheets, goals, assists and bonus aren't part of it.</p>
+    <h2>Limits</h2>
+    <p>Eight gameweeks is a small sample, especially for midfielders, where each team has only faced a handful of included players. The midfielder leak index leans heavily on the league average until more games are played. Treat it all as a strong lean rather than a certainty. Positions follow FPL's labels, which decide the scoring threshold, even when a player is used elsewhere on the pitch. Rotation, injuries and tactical changes after the last update aren't known until they show up in the data.</p>
+  </section>
+
+  <footer>Unofficial fan tool. Not affiliated with Fantasy Premier League or the Premier League. Data from FPL's public API.</footer>
+</main>
+</div>
+
+<script>
+  // Where the live data lives. GitHub refreshes this file automatically; see README.md.
+  window.DEFCON_DATA_URL = "https://raw.githubusercontent.com/essam5051/defcon-scout/data/data.json";
+</script>
+<script id="embedded-data" type="application/json">/*DATA*/</script>
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  let D, T = {};
+  const state = {view:'picks', h:+(store.get('h')||5), venue:'all', pPos:store.get('pPos')||'ALL', tPos:'DEF', dPos:'ALL', picks:{key:'exp',dir:-1}, teams:{key:'index',dir:-1}, def:{key:'hits',dir:-1}, open:null, cmp:loadCmp(), cmpH:1};
+  function loadCmp(){try{const a=JSON.parse(store.get('cmp')||'[]');return Array.isArray(a)?a.slice(0,4):[]}catch(e){return []}}
+  function saveCmp(){store.set('cmp',JSON.stringify(state.cmp)); updateCmpUI();}
+
+  function boot(data){
+    D = data; D.teams.forEach(t => T[t.id] = t);
+    const gws = D.finishedGws;
+    if(!gws.length){ document.querySelector('main').innerHTML = '<p class="note"><b>No gameweeks played yet.</b> The tracker fills in after GW1 finishes.</p>'; return; }
+    const ageDays = (Date.now() - new Date(D.generated)) / 86400000;
+    if(ageDays > 3) document.querySelector('main').insertAdjacentHTML('afterbegin', `<p class="note"><b>This data is ${Math.floor(ageDays)} days old.</b> The automatic update may have stopped. It normally refreshes every few hours.</p>`);
+    $('#meta').textContent = `GW${gws[0]}–${D.lastGw} data · next: GW${D.nextGw} · updated ${new Date(D.generated).toLocaleDateString(undefined,{day:'numeric',month:'short'})}`;
+    const L=D.league; $('#sampleNote').innerHTML = `<b>Small sample.</b> Based on ${D.lastGw} gameweeks. Defenders hit DEFCON in ${pct(L.DEF.rate)} of their 60+ minute games (${L.DEF.apps} games); included midfielders in ${pct(L.MID.rate)} (${L.MID.apps} games). Numbers firm up every week.`;
+    $('#midNote').innerHTML = `<b>Thin data for midfielders.</b> Only ${L.MID.apps} games of 60+ minutes from included midfielders so far, around ${Math.round(L.MID.apps/D.teams.length)} per team, so every midfielder leak index is pulled strongly toward 1.00.`;
+    const teamOpts = '<option value="">All teams</option>' + [...D.teams].sort((a,b)=>a.name.localeCompare(b.name)).map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+    $('#p-team').innerHTML = teamOpts; $('#d-team').innerHTML = teamOpts;
+    const prices = [...new Set(D.players.map(p=>p.price))].sort((a,b)=>b-a);
+    $('#p-price').innerHTML = '<option value="99">Any</option>' + prices.map(p=>`<option value="${p}">£${p.toFixed(1)}m</option>`).join('');
+    if(![3,5,8].includes(state.h)) state.h = 5;
+    D.byId = {}; D.players.forEach(p=>D.byId[p.id]=p);
+    state.cmp = state.cmp.filter(id=>D.byId[id]);
+    D.label = p => `${p.name} (${T[p.team].short}, ${p.pos}, £${p.price.toFixed(1)}m)`;
+    $('#c-list').innerHTML = [...D.players].sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${esc(D.label(p))}"></option>`).join('');
+    wire(); updateCmpUI(); route();
+  }
+
+  const pct = x => x==null ? '–' : Math.round(x*100)+'%';
+  const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const sortBy = (arr, key, dir) => arr.sort((a,b)=>{const x=key(a),y=key(b); if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; return (x<y?-1:x>y?1:0)*dir;});
+  function flag(p){
+    if(p.status==='a') return '';
+    const label = {i:'Injured',s:'Suspended',u:'Unavailable',n:'Not available',d:(p.chance!=null?p.chance+'%':'Doubtful')}[p.status] || p.status;
+    const cls = p.status==='d' ? 'warn' : 'bad';
+    return `<span class="pill ${cls}" title="${esc(p.news||'')}">${label}</span>`;
+  }
+
+  function horizonFx(p){ return p.fixtures.filter(f=>f.gw < D.nextGw + state.h); }
+
+  function wire(){
+    document.querySelectorAll('#horizon button').forEach(b=>b.onclick=()=>{state.h=+b.dataset.h;store.set('h',state.h);renderPicks();});
+    document.querySelectorAll('#venue button').forEach(b=>b.onclick=()=>{state.venue=b.dataset.v;renderTeams();});
+    document.querySelectorAll('#p-pos button').forEach(b=>b.onclick=()=>{state.pPos=b.dataset.p;store.set('pPos',state.pPos);renderPicks();});
+    document.querySelectorAll('#t-pos button').forEach(b=>b.onclick=()=>{state.tPos=b.dataset.p;renderTeams();});
+    document.querySelectorAll('#d-pos button').forEach(b=>b.onclick=()=>{state.dPos=b.dataset.p;renderDef();});
+    ['#p-price','#p-team','#p-min','#p-q'].forEach(s=>$(s).addEventListener('input',renderPicks));
+    ['#d-team','#d-min','#d-q'].forEach(s=>$(s).addEventListener('input',renderDef));
+    document.querySelectorAll('#c-h button').forEach(b=>b.onclick=()=>{state.cmpH=+b.dataset.h;renderCompare();});
+    const add=$('#c-add');
+    const tryAdd=()=>{const v=add.value.trim(); if(!v) return; const p=D.players.find(p=>D.label(p)===v) || D.players.find(p=>p.name.toLowerCase()===v.toLowerCase());
+      if(p){ if(!state.cmp.includes(p.id) && state.cmp.length<4){state.cmp.push(p.id);saveCmp();} add.value=''; renderCompare(); }};
+    add.addEventListener('change',tryAdd); add.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();tryAdd();}});
+    window.addEventListener('hashchange',route);
+  }
+  function route(){
+    const v = (location.hash||'#picks').slice(1);
+    state.view = ['picks','compare','teams','log','method'].includes(v) ? v : 'picks';
+    ['picks','compare','teams','log','method'].forEach(n=>{$('#v-'+n).hidden = n!==state.view;});
+    document.querySelectorAll('nav a').forEach(a=>{ if(a.dataset.view===state.view) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+    ({picks:renderPicks,compare:renderCompare,teams:renderTeams,log:renderDef,method:()=>{}})[state.view]();
+  }
+
+  function header(cols, st, onSort){
+    return '<thead><tr>' + cols.map(c=>{
+      if(!c.sort) return `<th class="${c.cls||''}">${c.label}</th>`;
+      const s = st.key===c.sort ? (st.dir<0?'descending':'ascending') : null;
+      return `<th class="sort ${c.cls||''}" data-sort="${c.sort}" ${s?`aria-sort="${s}"`:''} tabindex="0">${c.label}</th>`;
+    }).join('') + '</tr></thead>';
+  }
+  function bindSort(table, st, render){
+    table.querySelectorAll('th.sort').forEach(th=>{
+      const go=()=>{const k=th.dataset.sort; if(st.key===k) st.dir*=-1; else {st.key=k; st.dir=(k==='name'||k==='team'||k==='price')?1:-1;} render();};
+      th.onclick=go; th.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+    });
+  }
+
+  function chipClass(p){ return p>=.5?'g3':p>=.35?'g2':p>=.22?'g1':'g0'; }
+  function fxChips(p){
+    const fx = horizonFx(p);
+    if(!fx.length) return '<span class="sub">No fixtures</span>';
+    return '<div class="fx">' + fx.map(f=>`<span class="chip ${chipClass(f.p)}" title="GW${f.gw}: ${pct(f.p)} chance of a hit if he plays">${T[f.opp].short}<small>${f.home?'H':'A'} · ${pct(f.p)}</small></span>`).join('') + '</div>';
+  }
+  function gameLog(p){
+    if(!p.games.length) return '<span class="sub">No appearances yet.</span>';
+    return '<div class="log">' + p.games.map(g=>`<div class="g">${cell(g,p.pos)}<span>GW${g.gw}</span><span>${T[g.opp].short} ${g.home?'H':'A'}</span><span>${g.min}′</span></div>`).join('') + '</div>';
+  }
+  function cell(g,pos){
+    let cls = g.min<D.minMinutes ? 'short' : g.hit ? 'hit' : g.act>=D.threshold[pos]-2 ? 'near' : 'miss';
+    const t = `GW${g.gw} vs ${T[g.opp].short} (${g.home?'H':'A'}), ${g.min} min, ${g.act} actions${g.hit?', DEFCON':''}`;
+    return `<span class="cell ${cls}" title="${t}">${g.act}</span>`;
+  }
+
+  function renderPicks(){
+    document.querySelectorAll('#horizon button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.h===state.h));
+    document.querySelectorAll('#p-pos button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===state.pPos));
+    const maxP = +$('#p-price').value || 99, team = +$('#p-team').value || 0, minG = +$('#p-min').value || 0, q = $('#p-q').value.trim().toLowerCase();
+    let rows = D.players.filter(p=>(state.pPos==='ALL'||p.pos===state.pPos) && p.price<=maxP && (!team||p.team===team) && p.apps60>=minG && (!q||p.name.toLowerCase().includes(q)||p.full.toLowerCase().includes(q)))
+      .map(p=>{const fx=horizonFx(p); const e=fx.reduce((s,f)=>s+f.e,0); return {p, exp:e, pts:2*e, n:fx.length};});
+    const keys = {exp:r=>r.exp, name:r=>r.p.name, team:r=>T[r.p.team].short, price:r=>r.p.price, rate:r=>r.p.rate, rel:r=>r.p.reliability, act:r=>r.p.avgActions};
+    sortBy(rows, keys[state.picks.key], state.picks.dir);
+    const cols = [{label:'#'},{label:'Player',sort:'name'},{label:'Pos'},{label:'Team',sort:'team'},{label:'£',sort:'price',cls:'num'},{label:'Hit rate',sort:'rate',cls:'num'},{label:'Avg actions',sort:'act',cls:'num hide-sm'},{label:'60′ starts',sort:'rel',cls:'num'},{label:'Fixtures'},{label:'Exp. hits',sort:'exp',cls:'num'},{label:'Exp. pts',cls:'num'}];
+    const tb = $('#t-picks');
+    if(!rows.length){ tb.innerHTML = header(cols,state.picks)+`<tbody><tr><td colspan="${cols.length}" class="empty">No players match these filters. Try a higher price or fewer minimum games.</td></tr></tbody>`; bindSort(tb,state.picks,renderPicks); return; }
+    tb.innerHTML = header(cols,state.picks) + '<tbody>' + rows.map((r,i)=>{
+      const p=r.p, open = state.open===p.id;
+      return `<tr class="row" data-id="${p.id}" aria-expanded="${open}"><td class="rank">${i+1}</td>
+        <td><span class="pname">${esc(p.name)}</span>${flag(p)}${p.apps60<4?'<span class="pill low">Low sample</span>':''}</td>
+        <td><span class="posb" data-pos="${p.pos}">${p.pos}</span></td>
+        <td><span class="team">${T[p.team].short}</span></td>
+        <td class="num">${p.price.toFixed(1)}</td>
+        <td class="num"><b>${pct(p.rate)}</b> <span class="sub">${p.hits60}/${p.apps60}</span></td>
+        <td class="num hide-sm">${p.avgActions??'–'}</td>
+        <td class="num">${pct(p.reliability)}</td>
+        <td>${fxChips(p)}</td>
+        <td class="num"><span class="big">${r.exp.toFixed(2)}</span><div class="sub">in ${r.n} game${r.n===1?'':'s'}</div></td>
+        <td class="num">${r.pts.toFixed(1)}</td></tr>` +
+        (open ? `<tr class="detail"><td colspan="${cols.length}"><div class="detailbox"><div><div class="lbl">Game log</div>${gameLog(p)}</div><div><div class="lbl">Season</div><div>${p.hitsAll} DEFCON hits in all games · ${p.nearMiss} near misses · ${p.selected}% owned</div>${p.news?`<div class="sub">${esc(p.news)}</div>`:''}</div></div></td></tr>` : '');
+    }).join('') + '</tbody>';
+    bindSort(tb,state.picks,renderPicks);
+    tb.querySelectorAll('tr.row').forEach(tr=>tr.onclick=()=>{const id=+tr.dataset.id; state.open = state.open===id?null:id; renderPicks();});
+  }
+
+  function updateCmpUI(){
+    const n=state.cmp.length, c=$('#cmpCount'); c.hidden=!n; c.textContent=n;
+  }
+
+  function expOver(p,h){ return p.fixtures.filter(f=>f.gw<D.nextGw+h).reduce((s,f)=>s+f.e,0); }
+  function spanLabel(h){ return h===1?`the next gameweek (GW${D.nextGw})`:`the next ${h} gameweeks`; }
+  function shortSpan(h){ return h===1?'Next GW':`Next ${h} GWs`; }
+  function verdictFor(ps,h){
+    const r = ps.map(p=>({p,e:expOver(p,h)})).sort((a,b)=>b.e-a.e);
+    const close = r[0].e - r[1].e < 0.05;
+    return {r, close};
+  }
+
+  function renderCompare(){
+    document.querySelectorAll('#c-h button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.h===state.cmpH));
+    $('#c-add').disabled = state.cmp.length>=4;
+    $('#c-add').placeholder = state.cmp.length>=4 ? 'Remove a player to add another' : 'Type a name';
+    const out=$('#cmpOut'), ps=state.cmp.map(id=>D.byId[id]);
+    if(!ps.length){ out.innerHTML = '<div class="tablebox"><p class="empty">Type a player\'s name above to add him. You can compare up to 4.</p></div>'; return; }
+    const h=state.cmpH, gws=Array.from({length:h},(_,i)=>D.nextGw+i);
+    let html='';
+    if(ps.length>=2){
+      const {r,close}=verdictFor(ps,h);
+      const pts=x=>(2*x).toFixed(1);
+      const head = close ? `<b>${esc(r[0].p.name)}</b> and <b>${esc(r[1].p.name)}</b> are too close to call for ${spanLabel(h)}`
+                         : `<b>${esc(r[0].p.name)}</b> is the better DEFCON pick for ${spanLabel(h)}`;
+      const line = r.map(x=>`${esc(x.p.name)} ${x.e.toFixed(2)}`).join(' · ');
+      const why = (()=>{ if(close||ps.length<2) return ''; const a=r[0].p,b=r[1].p;
+        if(h===1){ const fa=a.fixtures.find(f=>f.gw===D.nextGw), fb=b.fixtures.find(f=>f.gw===D.nextGw);
+          if(fa&&fb) return ` ${esc(a.name)} has a ${pct(fa.p)} chance against ${T[fa.opp].name} (${fa.home?'H':'A'}); ${esc(b.name)} has ${pct(fb.p)} against ${T[fb.opp].name} (${fb.home?'H':'A'}).`;
+          if(fa&&!fb) return ` ${esc(b.name)} has no game next gameweek.`; }
+        return ''; })();
+      html += `<div class="verdict"><h2>${head}</h2><p>Expected DEFCON hits: ${line}. That's about ${r.map(x=>pts(x.e)).join(' vs ')} DEFCON points.${why}</p></div>`;
+      html += '<div class="vstrip">' + [1,3,5,8].map(hh=>{ const v=verdictFor(ps,hh); const lead=v.r[0], gap=lead.e-v.r[1].e;
+        return `<button type="button" class="vcell" data-h="${hh}" aria-pressed="${hh===h}"><span class="lbl">${shortSpan(hh)}</span><span class="w">${v.close?'Too close':esc(lead.p.name)}</span><span class="m">${v.close?'within 0.05':'+'+gap.toFixed(2)+' exp. hits'}</span></button>`; }).join('') + '</div>';
+    } else {
+      html += '<div class="verdict"><h2>Add one more player to get a verdict</h2><p>You can compare up to 4 players.</p></div>';
+    }
+    const best=(vals,hi=true)=>{const ok=vals.filter(v=>v!=null); if(ps.length<2||!ok.length) return vals.map(()=>false); const m=hi?Math.max(...ok):Math.min(...ok); const cnt=ok.filter(v=>v===m).length; return vals.map(v=>v===m&&cnt<ps.length);};
+    const row=(k,vals,fmt,hi=true,hl=true)=>{const b=hl?best(vals,hi):vals.map(()=>false); return `<tr><td class="k">${k}</td>${vals.map((v,i)=>`<td class="v ${b[i]?'best':''}">${fmt(v,ps[i])}</td>`).join('')}</tr>`;};
+    const sec=t=>`<tr class="sec"><td colspan="${ps.length+1}">${t}</td></tr>`;
+    let t = '<thead><tr><th></th>' + ps.map(p=>`<th class="ph"><span class="pname">${esc(p.name)}</span><button type="button" class="x" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">×</button>${flag(p)}<div class="sub"><span class="posb" data-pos="${p.pos}">${p.pos}</span> ${T[p.team].short} · £${p.price.toFixed(1)}m</div></th>`).join('') + '</tr></thead><tbody>';
+    const exps=ps.map(p=>expOver(p,h));
+    t += sec(`Outlook · ${shortSpan(h)}`);
+    t += row('Expected DEFCON hits', exps, v=>`<span class="big">${v.toFixed(2)}</span>`);
+    t += row('Expected DEFCON points', exps.map(v=>2*v), v=>v.toFixed(1), true, false);
+    gws.forEach(gw=>{
+      t += `<tr><td class="k">GW${gw}</td>` + ps.map(p=>{
+        const fs=p.fixtures.filter(f=>f.gw===gw);
+        if(!fs.length) return '<td class="v"><span class="sub">No game</span></td>';
+        return '<td class="v">' + fs.map(f=>{ const tp=T[f.opp][p.pos.toLowerCase()], li=(f.home?tp.away:tp.home).index;
+          return `<div class="fxc"><span class="chip ${chipClass(f.p)}">${T[f.opp].short}<small>${f.home?'H':'A'} · ${pct(f.p)}</small></span><span class="sub">leak ${li.toFixed(2)}</span></div>`; }).join('') + '</td>';
+      }).join('') + '</tr>';
+    });
+    t += sec('Season so far');
+    t += row('Hit rate (60+ min games)', ps.map(p=>p.rate), (v,p)=>`<b>${pct(v)}</b> <span class="sub">${p.hits60} of ${p.apps60}</span>`);
+    t += row('Average actions', ps.map(p=>p.avgActions), (v,p)=>v==null?'–':`${v} <span class="sub">needs ${D.threshold[p.pos]}</span>`);
+    t += row('Near misses', ps.map(p=>p.nearMiss), v=>v, true, false);
+    t += row('Played 60+ minutes', ps.map(p=>p.reliability), v=>pct(v));
+    t += row('Game log', ps.map(()=>null), (v,p)=>`<div class="grid">${D.finishedGws.map(gw=>{const gs=p.games.filter(g=>g.gw===gw); if(!gs.length) return '<span class="cell dnp" title="GW'+gw+': did not play">·</span>'; return gs.map(g=>cell(g,p.pos)).join('');}).join('')}</div>`, true, false);
+    t += '</tbody>';
+    html += `<div class="tablebox"><table class="cmp">${t}</table></div>`;
+    html += `<p class="small">Chip = his chance of a DEFCON hit in that game if he plays 60+ minutes. Leak = how much that opponent allows to his position at that venue (1.00 is average). Expected hits also allow for how often he plays 60+ minutes and any injury flag. DEFCON points only: clean sheets, goals and assists aren't included.</p>`;
+    out.innerHTML = html;
+    out.querySelectorAll('.x').forEach(b=>b.onclick=()=>{state.cmp=state.cmp.filter(x=>x!==+b.dataset.id);saveCmp();renderCompare();});
+    out.querySelectorAll('.vcell').forEach(b=>b.onclick=()=>{state.cmpH=+b.dataset.h;renderCompare();});
+  }
+
+  function renderTeams(){
+    document.querySelectorAll('#venue button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===state.venue));
+    document.querySelectorAll('#t-pos button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===state.tPos));
+    $('#midNote').hidden = state.tPos!=='MID';
+    const v = state.venue, k = state.tPos.toLowerCase();
+    const rows = D.teams.map(t=>{
+      const a = t[k], s = v==='all' ? a : a[v];
+      const chances=s.chances, hits=s.hits, exp=v==='all'?a.expected:s.exp;
+      return {t, chances, hits, rate: chances?hits/chances:null, exp, diff: hits-exp, index: s.index, perGame: v==='all'&&a.games?hits/a.games:null};
+    });
+    const keys = {name:r=>r.t.name, rate:r=>r.rate, hits:r=>r.hits, diff:r=>r.diff, index:r=>r.index, perGame:r=>r.perGame};
+    sortBy(rows, keys[state.teams.key], state.teams.dir);
+    const cols=[{label:'#'},{label:'Team',sort:'name'},{label:'Allowed',sort:'hits',cls:'num'},{label:'Allowed rate',sort:'rate',cls:'num'},...(v==='all'?[{label:'Per game',sort:'perGame',cls:'num'}]:[]),{label:'Vs expected',sort:'diff',cls:'num'},{label:'Leak index',sort:'index'}];
+    const tb=$('#t-teams');
+    tb.innerHTML = header(cols,state.teams) + '<tbody>' + rows.map((r,i)=>{
+      const off = Math.max(-1,Math.min(1,(r.index-1)/0.6));
+      const w = Math.abs(off)*50, left = off>=0?50:50-w;
+      const col = off>=0?'var(--good)':'var(--bad)';
+      return `<tr><td class="rank">${i+1}</td><td><span class="pname">${esc(r.t.name)}</span> <span class="team">${r.t.short}</span></td>
+        <td class="num">${r.hits} <span class="sub">of ${r.chances}</span></td>
+        <td class="num"><b>${pct(r.rate)}</b></td>
+        ${v==='all'?`<td class="num">${r.perGame==null?'–':r.perGame.toFixed(2)}</td>`:''}
+        <td class="num"><span class="${r.diff>0.5?'pos':r.diff<-0.5?'neg':''}">${r.diff>0?'+':''}${r.diff.toFixed(1)}</span> <span class="sub">exp ${r.exp.toFixed(1)}</span></td>
+        <td><span class="idx"><span class="ibar"><span class="ibar-mid"></span><i style="left:${left}%;width:${w}%;background:${col}"></i></span><b>${r.index.toFixed(2)}</b></span></td></tr>`;
+    }).join('') + '</tbody>';
+    bindSort(tb,state.teams,renderTeams);
+  }
+
+  function renderDef(){
+    document.querySelectorAll('#d-pos button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===state.dPos));
+    const team=+$('#d-team').value||0, minG=+$('#d-min').value||0, q=$('#d-q').value.trim().toLowerCase();
+    let rows = D.players.filter(p=>(state.dPos==='ALL'||p.pos===state.dPos) && (!team||p.team===team) && p.apps60>=minG && (!q||p.name.toLowerCase().includes(q)||p.full.toLowerCase().includes(q)));
+    const keys={name:p=>p.name,team:p=>T[p.team].short,price:p=>p.price,rate:p=>p.rate,hits:p=>p.hits60,act:p=>p.avgActions};
+    sortBy(rows, keys[state.def.key], state.def.dir);
+    const gws=D.finishedGws;
+    const cols=[{label:'Player',sort:'name'},{label:'Pos'},{label:'Team',sort:'team'},{label:'£',sort:'price',cls:'num'},{label:'Hits',sort:'hits',cls:'num'},{label:'Hit rate',sort:'rate',cls:'num'},{label:'Avg actions',sort:'act',cls:'num'},{label:gws.map(g=>`<span style="display:inline-block;width:28px;text-align:center">${g}</span>`).join('<span style="display:inline-block;width:3px"></span>')}];
+    const tb=$('#t-def');
+    if(!rows.length){ tb.innerHTML = header(cols,state.def)+`<tbody><tr><td colspan="${cols.length}" class="empty">No players match these filters.</td></tr></tbody>`; bindSort(tb,state.def,renderDef); return; }
+    tb.innerHTML = header(cols,state.def) + '<tbody>' + rows.map(p=>{
+      const grid = gws.map(gw=>{const gs=p.games.filter(g=>g.gw===gw); if(!gs.length) return '<span class="cell dnp">·</span>'; if(gs.length===1) return cell(gs[0],p.pos); return `<span class="cell dgw">${gs.map(g=>cell(g,p.pos)).join('')}</span>`;}).join('');
+      return `<tr><td><span class="pname">${esc(p.name)}</span>${flag(p)}</td><td><span class="posb" data-pos="${p.pos}">${p.pos}</span></td><td><span class="team">${T[p.team].short}</span></td><td class="num">${p.price.toFixed(1)}</td>
+        <td class="num">${p.hits60}<span class="sub">/${p.apps60}</span></td><td class="num"><b>${pct(p.rate)}</b></td><td class="num">${p.avgActions??'–'}</td>
+        <td><div class="grid">${grid}</div></td></tr>`;
+    }).join('') + '</tbody>';
+    bindSort(tb,state.def,renderDef);
+  }
+
+  const raw = document.getElementById('embedded-data').textContent.trim();
+  const fail = () => document.querySelector('main').insertAdjacentHTML('afterbegin','<p class="note"><b>The data didn\'t load.</b> Check your connection and refresh the page.</p>');
+  if(raw && raw !== '/*DATA*/') boot(JSON.parse(raw));
+  else fetch(window.DEFCON_DATA_URL + '?v=' + Math.floor(Date.now()/600000), {cache:'no-cache'})
+    .then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).then(boot).catch(fail);
+})();
+</script>
+</body><!--SHELL-->
+</html><!--SHELL-->
